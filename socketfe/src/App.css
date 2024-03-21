@@ -1,0 +1,169 @@
+
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.container {
+  transition: opacity 0.5s ease-in-out;
+}
+.hidden {
+  opacity: 0;
+}
+.block {
+  opacity: 1;
+}
+
+.slider-item {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.slider-item.active {
+  opacity: 1;
+}
+
+.slider-item.previous {
+  opacity: 0;
+}
+
+.slider-button {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  margin: 0 2px;
+  background-color: #8c8c8c;
+  transition: background-color 0.5s ease-in-out;
+}
+
+.slider-button.active {
+  background-color: #4b4bff;
+}
+
+
+
+button{
+  cursor:pointer;
+  &:focus{
+    outline:none;
+  }
+}
+
+/* Animations */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+/* Slide-in-up animation*/
+.slide-in-up-enter-active, .slide-in-up-leave-active {
+  transition: all .5s;
+  transform: translateY(0);
+}
+.slide-in-up-enter, .slide-in-up-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Slide-in-right animation*/
+.slide-in-right-enter-active, .slide-in-right-leave-active {
+  transition: all .5s;
+  transform: translateX(0);
+}
+.slide-in-right-enter, .slide-in-right-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+/* Slide-in-left animation*/
+.slide-in-left-enter-active, .slide-in-left-leave-active {
+  transition: all .5s;
+  transform: translateX(0);
+}
+.slide-in-left-enter, .slide-in-left-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* Scale animation*/
+.scale-enter-active, .scale-leave-active {
+  transition: all .5s;
+  transform: scale(1);
+}
+.scale-enter, .scale-leave-to {
+  opacity: 0;
+  transform: scale(0);
+}
+
+/* Rotate animation*/
+.rotate-enter-active, .rotate-leave-active {
+  transition: all .5s;
+  transform: scale(1) rotate(-360deg);
+}
+.rotate-enter, .rotate-leave-to {
+  opacity: 0;
+  transform: scale(0) rotate(360deg);
+}
+
+ /* width */
+ #scroll::-webkit-scrollbar {
+  width: 1px;
+}
+
+/* Track */
+#scroll::-webkit-scrollbar-track {
+  background:rgb(113, 117, 172);
+}
+
+/* Handle */
+#scroll::-webkit-scrollbar-thumb {
+  background:rgb(44, 47, 88);
+}
+
+.scrollView::-webkit-scrollbar{
+  display: none;
+}
+
+#sortbox:checked ~ #sortboxmenu {
+  display: block;
+  opacity: 1;
+}
+
+.rdt_ExpanderRow .flex .px-8{
+  width: inherit !important;
+  margin-left: 15px;
+}
