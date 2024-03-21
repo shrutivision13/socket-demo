@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken")
 module.exports = (socket, next) => {
-    console.log("🚀 ~ socket:", socket)
     const token = socket.handshake.auth.token;
     console.log("🚀 ~ authenticateSocket ~ token:", token)
     if (!token) {

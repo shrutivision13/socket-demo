@@ -9,6 +9,7 @@ var debug = require("debug")("socketbe:server");
 var http = require("http");
 const { default: mongoose } = require("mongoose");
 const socketIo = require("socket.io");
+const { register } = require("../controller/auth");
 require("dotenv").config();
 /**
  * Get port from environment and store in Express.
@@ -85,9 +86,10 @@ async function onListening() {
       "mongodb://localhost:27017/employee",
 
     )
-    .then(() => {
+    .then(async () => {
       console.log("Listening on port " + addr.port);
       console.log("DB Connected!")
+      await register({ email: "admin@gmail.com", password: "123456", role: "admin", username: "admin", address: "surat" })
     })
     .catch((err) => console.log(err));
 

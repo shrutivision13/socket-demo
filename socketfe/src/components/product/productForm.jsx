@@ -71,12 +71,12 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
   };
   return (
     <div>
-      <div className="max-w-[650px] mx-auto px-4 bg-gray-800 rounded-md shadow-md form-container">
+      <div className="max-w-[650px] mx-auto px-4  rounded-md  form-container">
         <form>
           <div className="mb-4">
             <label
               htmlFor="name"
-              className="block text-gray-300 text-sm font-bold mb-2"
+              className="block text-primary text-sm font-bold mb-2"
             >
               Name
             </label>
@@ -88,7 +88,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
               onChange={handleChange}
               placeholder="Name"
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-gray-700 text-white"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-primary text-primary"
             />
             {errors?.name && (
               <p className="text-red-500 mt-2 text-[11px]">{errors?.name}</p>
@@ -97,7 +97,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
           <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-gray-300 text-sm font-bold mb-2"
+              className="block text-primary text-sm font-bold mb-2"
             >
               Price
             </label>
@@ -109,7 +109,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
               value={productData?.price}
               placeholder="price"
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-gray-700 text-white"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-primary text-primary"
             />
             {errors?.price && (
               <p className="text-red-500 mt-2 text-[11px]">{errors?.price}</p>
@@ -118,7 +118,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
           {/* <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-gray-300 text-sm font-bold mb-2"
+              className="block text-primary text-sm font-bold mb-2"
             >
               SKU
             </label>
@@ -131,7 +131,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
               value={productData?.sku}
               placeholder="sku"
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-gray-700 text-white"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-primary text-primary"
             />
             {errors?.sku && (
               <p className="text-red-500 mt-2 text-[11px]">{errors?.sku}</p>
@@ -140,7 +140,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
           <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-gray-300 text-sm font-bold mb-2"
+              className="block text-primary text-sm font-bold mb-2"
             >
               Stock quantity
             </label>
@@ -152,7 +152,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
               value={productData?.stockQty}
               placeholder="stock quantity"
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-gray-700 text-white"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-primary text-primary"
             />
             {errors?.stockQty && (
               <p className="text-red-500 mt-2 text-[11px]">
@@ -163,7 +163,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
           <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-gray-300 text-sm font-bold mb-2"
+              className="block text-primary text-sm font-bold mb-2"
             >
               Discount
             </label>
@@ -175,7 +175,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
               value={productData?.discount}
               placeholder="stock quantity"
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-gray-700 text-white"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 bg-primary text-primary"
             />
             {errors?.discount && (
               <p className="text-red-500 mt-2 text-[11px]">
@@ -186,7 +186,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
           <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-gray-300 text-sm font-bold mb-2"
+              className="block text-primary text-sm font-bold mb-2"
             >
               Category
             </label>
@@ -209,7 +209,7 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
           </div>
           <div className="mb-4 ">
             <div className="mb-6 pt-4">
-              <label className="mb-5 block text-xl font-semibold text-white">
+              <label className="mb-5 block text-xl font-semibold text-primary">
                 Upload File
               </label>
 
@@ -227,13 +227,13 @@ const ProductForm = ({ productData, setProductData, errors, setError }) => {
                   className="relative flex min-h-[200px] items-center justify-center rounded-md border border-dashed border-[#e0e0e0] p-12 text-center"
                 >
                   <div>
-                    <span className="mb-2 block text-xl font-semibold text-white">
+                    <span className="mb-2 block text-xl font-semibold text-primary">
                       Drop files here
                     </span>
                     <span className="mb-2 block text-base font-medium text-slate-400">
                       Or
                     </span>
-                    <span className="inline-flex rounded border border-[#e0e0e0] py-2 px-7 text-base font-medium text-white">
+                    <span className="inline-flex rounded border border-[#e0e0e0] py-2 px-7 text-base font-medium text-primary">
                       Browse
                     </span>
                   </div>

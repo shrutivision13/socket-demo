@@ -263,7 +263,7 @@ async function handleResponse(response) {
 const createStripePaymentIntent = async (paymentItems, amount) => {
     console.log("🚀 ~ createStripePaymentIntent ~ amount:", amount)
     const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount * 100,
+        amount: Math.round(amount * 100),
         currency: "usd",
         // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
         automatic_payment_methods: {

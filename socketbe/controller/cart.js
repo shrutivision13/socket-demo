@@ -5,7 +5,6 @@ const Product = require('../models/product');
 
 
 const getAllOrders = async (query, user_id, res) => {
-    console.log("🚀 ~ getAllOrders ~ user_id:", user_id)
     try {
         return await Cart.paginate({ user_id, status: { $ne: "In cart" } }, { page: query?.page || 1, limit: query?.limit || 50, populate: "product_id.product" }, (err, results) => {
             if (err) return err

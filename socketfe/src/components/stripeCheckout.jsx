@@ -52,9 +52,9 @@ const StripeCheckout = ({ setCartProduct, cartProduct, navigate }) => {
             console.log("🚀 ~ socket.on ~ data:", data);
             if (data?.status === 200) {
               setCartProduct();
+              toast.success("Payment succeeded!");
               navigate(`/user/success/${cartProduct?._id}`);
 
-              toast.success("Payment succeeded!");
             }
           });
           break;

@@ -7,10 +7,6 @@ import { Elements, useElements, useStripe } from "@stripe/react-stripe-js";
 import StripeCheckout from "../stripeCheckout";
 import { loadStripe } from "@stripe/stripe-js";
 import { useNavigate } from "react-router-dom";
-const stripePromise = loadStripe(
-  process.env.REACT_APP_STRIPE_PUBLIC_KEY ||
-    "pk_test_51OvbPGIkYBbcGFTmiUqWapN7sJ2X6VcQSis5Knxo2hcm7lOKGqRBpVbrgGCMzG8rDjThBOfeIqAdqPzfFiiXELTp00WhOm93Pf"
-);
 
 const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
   const [paymentDetails, setPaymentDetails] = useState();
@@ -19,6 +15,8 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
   console.log("🚀 ~ Payment ~ submit:", submit);
   const [clientSecret, setClientSecret] = useState("");
   const navigate = useNavigate();
+  const stripePromise = loadStripe("pk_test_51OvbPGIkYBbcGFTmiUqWapN7sJ2X6VcQSis5Knxo2hcm7lOKGqRBpVbrgGCMzG8rDjThBOfeIqAdqPzfFiiXELTp00WhOm93Pf");
+  console.log("🚀 ~ stripePromise:", stripePromise)
 
   useEffect(() => {
     if (submit) {
@@ -75,8 +73,8 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
   };
 
   const authData = {
-    apiLoginID: process.env.REACT_APP_AUTHORIZED_LOGIN_ID,
-    clientKey: process.env.REACT_APP_AUTHORIZED_CLIENTKEY,
+    apiLoginID: "8JQ9VSHs7z68",
+    clientKey: "28MyM5fUJmBtPp2683JH5nnkx7CLp6u6KhFEFQs72T3EQV7554tbsY6jgC35fzDr",
   };
   console.log("🚀 ~ Payment ~ authData:", authData);
 
@@ -145,11 +143,11 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
       >
         <PayPalButtons createOrder={createOrder} onApprove={onApprove} />
       </PayPalScriptProvider>
-      <HostedForm
+      {!clientSecret && <HostedForm
         authData={authData}
         buttonStyle={buttonStyle}
         onSubmit={(data) => handleSubmit(data, amount)}
-      />
+      />}
       <button
         onClick={createStripePaymentIntent}
         className="text-base bg-indigo-500 mt-2 bg-gradient-to-r dark:from-cyan-500 dark:to-blue-500 from-indigo-500 via-purple-500 to-purple-500  bg-blue-700 rounded-lg leading-none w-full py-3 bg-gray-800 border-gray-800 border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-white dark:hover:bg-gray-700"
