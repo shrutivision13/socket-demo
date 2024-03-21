@@ -2,7 +2,6 @@ const { addWishlist, removeWishlist, getAllWishlist } = require('../controller/w
 
 
 module.exports = (io, socket) => {
-    t
     const emitCarts = async (data) => {
         const carts = await getAllWishlist(io?.userId);
         io.emit("server:wishlists", carts);

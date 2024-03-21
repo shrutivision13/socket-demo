@@ -55,14 +55,20 @@ const stripeRefund = async (payment_id, id, status) => {
 
 }
 
-function refundTransaction(transactionId, callback) {
+function refundTransaction(transactionId, paymentDetails, callback) {
+    console.log("🚀 ~ refundTransaction ~ paymentDetails?.cardNumber?.slice(-4):", paymentDetails?.cardNumber?.slice(-4))
+    console.log("🚀 ~ refundTransaction ~ paymentDetails?.expiryDate?.replace():", paymentDetails?.expiryDate?.replace("/", ""))
+
+
     var merchantAuthenticationType = new ApiContracts.MerchantAuthenticationType();
     merchantAuthenticationType.setName(process.env.AUTHORIZED_API_LOGINID);
     merchantAuthenticationType.setTransactionKey(process.env.AUTHORIZED_TRANSACTION_KEY);
 
     var creditCard = new ApiContracts.CreditCardType();
-    creditCard.setCardNumber(cardNumber);
-    creditCard.setExpirationDate(expirydate);
+    creditCard.setCardNumber(paymentDetails?.cardNumber);
+    creditCard.setExpirationDate(paymentDetails?.expiryDate?.replace("/", ""));
+    // creditCard.setCardNumber(cardNumber);
+    // creditCard.setExpirationDate(expirydate);
 
     var paymentType = new ApiContracts.PaymentType();
     paymentType.setCreditCard(creditCard);
@@ -71,7 +77,7 @@ function refundTransaction(transactionId, callback) {
     transactionRequestType.setTransactionType(ApiContracts.TransactionTypeEnum.REFUNDTRANSACTION);
     transactionRequestType.setPayment(paymentType);
     transactionRequestType.setAmount(2);
-    transactionRequestType.setRefTransId(transactionId);
+    transactionRequestType.setRefTransId(transactionId?.transactionId);
 
     var createRequest = new ApiContracts.CreateTransactionRequest();
     createRequest.setMerchantAuthentication(merchantAuthenticationType);
@@ -91,38 +97,6 @@ function refundTransaction(transactionId, callback) {
         //pretty print response
         console.log(JSON.stringify(response, null, 2));
 
-        if (response != null) {
-            if (response.getMessages().getResultCode() == ApiContracts.MessageTypeEnum.OK) {
-                if (response.getTransactionResponse().getMessages() != null) {
-                    console.log('Successfully created transaction with Transaction ID: ' + response.getTransactionResponse().getTransId());
-                    console.log('Response Code: ' + response.getTransactionResponse().getResponseCode());
-                    console.log('Message Code: ' + response.getTransactionResponse().getMessages().getMessage()[0].getCode());
-                    console.log('Description: ' + response.getTransactionResponse().getMessages().getMessage()[0].getDescription());
-                }
-                else {
-                    console.log('Failed Transaction.');
-                    if (response.getTransactionResponse().getErrors() != null) {
-                        console.log('Error Code: ' + response.getTransactionResponse().getErrors().getError()[0].getErrorCode());
-                        console.log('Error message: ' + response.getTransactionResponse().getErrors().getError()[0].getErrorText());
-                    }
-                }
-            }
-            else {
-                console.log('Failed Transaction. ');
-                if (response.getTransactionResponse() != null && response.getTransactionResponse().getErrors() != null) {
-
-                    console.log('Error Code: ' + response.getTransactionResponse().getErrors().getError()[0].getErrorCode());
-                    console.log('Error message: ' + response.getTransactionResponse().getErrors().getError()[0].getErrorText());
-                }
-                else {
-                    console.log('Error Code: ' + response.getMessages().getMessage()[0].getCode());
-                    console.log('Error message: ' + response.getMessages().getMessage()[0].getText());
-                }
-            }
-        }
-        else {
-            console.log('Null Response.');
-        }
 
         callback(response);
     });

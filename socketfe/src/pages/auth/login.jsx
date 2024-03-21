@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { UserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import useSocket from "../../hooks/useSocket";
+import Button from "../../components/button";
 
 const Login = () => {
   const [userData, setUserData] = useState();
@@ -21,8 +22,6 @@ const Login = () => {
     setError({ ...error });
   };
   const handleSubmit = () => {
-    // setModalOpen(false);
-    // getAllEmployees();
     let err = { ...error };
     if (!userData?.password) {
       err = { ...err, password: "password is required" };
@@ -38,8 +37,8 @@ const Login = () => {
     socket.on("server:signin", (data) => {
       if (data?.status === 200) {
         // socket.disconnect();
-        // socket.connect();
         socket.auth.token = data?.data?.token;
+        socket.connect();
         setUserData({});
         localStorage.setItem("user", JSON.stringify(data?.data?.user));
         localStorage.setItem("token", data?.data?.token);
@@ -64,12 +63,6 @@ const Login = () => {
   return (
     <AuthLayout>
       <div className="mb-8 flex flex-col items-center">
-        {/* <img
-                src="https://www.logo.wine/a/logo/Instagram/Instagram-Glyph-Color-Logo.wine.svg"
-                width="150"
-                alt=""
-                srcset=""
-              /> */}
         <h1 className="mb-2 text-2xl">Termcode</h1>
         <span className="text-primary">Enter Login Details</span>
       </div>
@@ -109,19 +102,31 @@ const Login = () => {
           )}
         </div>
         <div className="mt-8 flex justify-center text-lg text-black gap-4">
-          <button
+          {/* <button
             type="submit"
             className="rounded-md w-[200px]    border-lightgray  border  bg-opacity-50 px-10 py-2 text-gradientblue shadow-xl backdrop-blur-md transition-colors duration-300 hover:bg-slate-400"
           >
             Cancel
-          </button>
-          <button
+          </button> */}
+          <Button
+            // onClick={handleSubmit}
+            title={"Cancel"}
+            active={false}
+            classList="w-[190px] py-4 h-11"
+          />
+          <Button
+            onClick={handleSubmit}
+            title={"Login"}
+            active={true}
+            classList="w-[190px] py-4 h-11"
+          />
+          {/* <button
             type="button"
             onClick={handleSubmit}
             className="rounded-md active:bg-indigo-500  w-[200px] bg-gradient-to-r shadow-xl dark:from-cyan-500 dark:to-blue-500 from-indigo-500 via-purple-500 to-purple-500  bg-blue-700  bg-opacity-50 px-10 py-2 text-white shadow-xl backdrop-blur-md transition-colors duration-300 hover:bg-yellow-600"
           >
             Login
-          </button>
+          </button> */}
         </div>
       </form>
     </AuthLayout>

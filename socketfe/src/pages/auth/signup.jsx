@@ -3,6 +3,7 @@ import AuthLayout from "../../components/authLayout/layout";
 import { toast } from "react-toastify";
 import { socket } from "../../socketConfig";
 import { useNavigate } from "react-router-dom";
+import Button from "../../components/button";
 
 const Signup = () => {
   const [userData, setUserData] = useState();
@@ -183,13 +184,25 @@ const Signup = () => {
           </div>
         </div>
         <div className="mt-8 flex justify-center  text-black gap-4">
-          <button
+          <Button
+            // onClick={handleSubmit}
+            title={"Cancel"}
+            active={false}
+            classList="w-[190px] py-4 h-11"
+          />
+          <Button
+            onClick={handleSubmit}
+            title={" Sign Up"}
+            active={true}
+            classList="w-[190px] py-4 h-11"
+          />
+          {/* <button
             type="button"
             onClick={handleSubmit}
             className="rounded-md active:bg-indigo-500  w-[200px] bg-gradient-to-r dark:from-cyan-500 dark:to-blue-500 from-indigo-500 via-purple-500 to-purple-500  bg-blue-700  bg-opacity-50 px-10 py-2 text-primary shadow-xl backdrop-blur-md transition-colors duration-300 hover:bg-yellow-600"
           >
             Sign Up
-          </button>
+          </button> */}
         </div>
       </form>
     </AuthLayout>

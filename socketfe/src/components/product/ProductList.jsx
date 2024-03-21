@@ -15,6 +15,9 @@ const ProductList = ({
   wishlistProduct = [],
   setWishlistProduct,
 }) => {
+  const { user, setUser } = useContext(UserContext);
+  console.log("🚀 ~ user:", user);
+
   const addToWishlist = (product_id) => {
     socket.emit("client:addtowishlist", product_id);
     socket.on("server:addtowishlist", (data) => {
@@ -52,7 +55,13 @@ const ProductList = ({
               >
                 <div
                   className="absolute right-5 top-5 z-[999]"
-                  onClick={() => addToWishlist(product?._id)}
+                  onClick={() => {
+                    if (!user?._id) {
+                      toast.error("Please login to add product in wishlist");
+                      return navigate("/user/signin");
+                    }
+                    addToWishlist(product?._id);
+                  }}
                 >
                   <WishlistSvg
                     fill={
@@ -108,16 +117,23 @@ const ProductList = ({
                       <div className="my-1">
                         <Button
                           active={true}
+                          // disabled={!user?._id}
                           title={
                             cartProduct?.includes(product?._id)
                               ? "Go to cart"
                               : "Add to cart"
                           }
-                          onClick={() =>
-                            cartProduct?.includes(product?._id)
+                          onClick={() => {
+                            if (!user?._id) {
+                              toast.error(
+                                "Please login to add product in cart"
+                              );
+                              return navigate("/user/signin");
+                            }
+                            return cartProduct?.includes(product?._id)
                               ? navigate("/user/cart")
-                              : addToCart(product?._id)
-                          }
+                              : addToCart(product?._id);
+                          }}
                           classList={"flex items-center justify-center gap-2"}
                         >
                           <CartSvg />

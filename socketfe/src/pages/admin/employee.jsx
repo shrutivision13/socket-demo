@@ -39,28 +39,15 @@ const Employee = ({ socket }) => {
   };
 
   const getAllEmployees = async () => {
-    socket.emit("client:employees", { page: currentPage, limit: 10 });
-    socket.on("server:loademployees", (data) => {
-      console.log("🚀 ~ socket.on ~ data:", data);
-      setTotal(data?.total);
-      // if (currentPage > 1)
-      //   setEmployees([...(employees || []), ...(data?.data || [])]);
-      // else {
-      if (data?.data?.length) setEmployees(data?.data);
-      // }
-      console.log("🚀 ~ socket.on ~ data:", data);
-    });
-    // let data = await apiAction({
-    //   url: `/employee?page=${currentPage}&limit=10`,
-    //   method: "get",
-    // });
-    // setTotal(data?.data?.count);
-    // if (currentPage > 1)
-    //   setEmployees([...(employees || []), ...(data?.data || [])]);
-    // else {
-    //   setEmployees(data?.data);
-    // }
-    // console.log("🚀 ~ getAllEmployees ~ data:", data);
+    setTimeout(() => {
+      socket.emit("client:employees", { page: currentPage, limit: 10 });
+      socket.on("server:loademployees", (data) => {
+        console.log("🚀 ~ socket.on ~ data:", data);
+        setTotal(data?.total);
+
+        if (data?.data?.length) setEmployees(data?.data);
+      });
+    }, 1000);
   };
 
   const handleSubmit = () => {

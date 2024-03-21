@@ -43,14 +43,13 @@ const server = http.createServer(app);
 const io = socketIo(server, { cors: { origin: "*" } });
 
 app.use((req, res, next) => {
-  console.log("🚀 ~ app.use ~ req:", req)
   req.io = io;
   next();
 });
 
 
+io.use(authentication)
 io.on('connection', async client => {
-  io.use(authentication)
   client.on("join_room", (room) => {
     client.join(room)
     io.to("socket_room-1").emit("receive_message", { message: `${room} joined` })

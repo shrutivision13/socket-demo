@@ -1,11 +1,8 @@
 import "./App.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { io } from "socket.io-client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import HigherOrderUse from "./pages/admin/hIgherOrderUse.jsx";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import Employee from "./pages/admin/employee.jsx";
-import SideBar from "./components/layout/sideBar.jsx";
 import Layout from "./components/layout/Layout.jsx";
 import Home from "./pages/admin/home.jsx";
 import Posts from "./pages/admin/posts.jsx";
@@ -27,6 +24,10 @@ import { UserContext } from "./context/UserContext.jsx";
 import Wishlist from "./pages/user/wishlist.jsx";
 import Orders from "./pages/user/Orders.jsx";
 import TransactionHistory from "./pages/admin/transactionHistory.jsx";
+import OrderSuccess from "./pages/user/OrderStatus.jsx";
+import OrderStatus from "./pages/user/OrderStatus.jsx";
+import UnAuthenticated from "./pages/UnAuthenticated.jsx";
+
 Modal.setAppElement('#root');
 function App() {
   const [count, setCount] = useState()
@@ -35,35 +36,20 @@ function App() {
   useEffect(() => {
 
 
-
-
-    socket.on("receive_message", (data) => {
-      console.log("🚀 ~ socket.on ~ data  : ", data)
-
-    })
     let user = JSON.parse(localStorage.getItem("user"))
     setUser(user)
+    console.log(process.env);
     // return () => {
     //   socket.off("receive_message")
     // }
   }, [])
-
-  const joinRoom = () => {
-    socket.emit("join_room", `socket_room-${localStorage.getItem("user_id")}`)
-
-  }
-
-  const ProtectedRoute = ({ element, user }) => {
-    // Check if user is authenticated
-    const isAuthenticated = !!user;
-
-    if (isAuthenticated) {
-      return <Route element={element} />;
-    } else {
-      // Redirect to login page if user is not authenticated
-      return <Navigate to="/user/signin" />;
-    }
+  const ProtectedRoute = ({ component: Component, ...rest }) => {
+    const isAuthenticated = localStorage.getItem("token");
+    return (
+      isAuthenticated ? <Outlet /> : <UnAuthenticated />
+    );
   };
+
 
   return (
     <div className="App">
@@ -80,21 +66,31 @@ function App() {
                 <Route path="/department" element={<Department socket={socket} />} />
                 <Route path="/transaction-history" element={<TransactionHistory socket={socket} />} />
                 <Route path="/product" element={<Product socket={socket} />} />
-                <Route
-                  path="/higherOrder"
-                  element={<HigherOrderUse socket={socket} />}
-                />
+
                 <Route path="/posts" element={<Posts socket={socket} />} />
                 {/* <Route path="/sidebar" element={<SideBar socket={socket} />} /> */}
               </Route>}
-              <Route Route path="/user" element={<UserLayout socket={socket} />}>
-
+              <Route path="/user" element={<UserLayout socket={socket} />}>
+                <Route path="/user" element={<ProtectedRoute socket={socket} />} >
+                  <Route path="/user/cart" element={<Cart />} />
+                  <Route path="/user/wishlist" element={<Wishlist />} />
+                  <Route path="/user/success/:orderId" element={<OrderStatus status={true} />} />
+                  <Route path="/user/fail" element={<OrderStatus />} />
+                  <Route path="/user/orders" element={<Orders />} />
+                </Route>
+                {/* <ProtectedRoute
+                  path="/dashboard"
+                  component={Posts}
+                  isAuthenticated={true}
+                /> */}
                 <Route path="/user/products" element={<Products socket={socket} />} />
-                <Route path="/user/cart" element={<Cart />} />
-                <Route path="/user/wishlist" element={<Wishlist />} />
-                <Route path="/user/orders" element={<Orders />} />
                 {user?.role === "user" &&
                   <>
+                    <Route path="/user/cart" element={<Cart />} />
+                    <Route path="/user/wishlist" element={<Wishlist />} />
+                    <Route path="/user/success/:orderId" element={<OrderStatus status={true} />} />
+                    <Route path="/user/fail" element={<OrderStatus />} />
+                    <Route path="/user/orders" element={<Orders />} />
                   </>
                 }
                 <Route path="/user/signin" element={<Login socket={socket} />} />

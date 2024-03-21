@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { socket } from "../socketConfig";
 
-const StripeCheckout = ({ setCartProduct, cartProduct }) => {
+const StripeCheckout = ({ setCartProduct, cartProduct, navigate }) => {
   const stripe = useStripe();
   const elements = useElements();
   console.log("🚀 ~ StripeCheckout ~ elements:", elements);
@@ -52,6 +52,8 @@ const StripeCheckout = ({ setCartProduct, cartProduct }) => {
             console.log("🚀 ~ socket.on ~ data:", data);
             if (data?.status === 200) {
               setCartProduct();
+              navigate(`/user/success/${cartProduct?._id}`);
+
               toast.success("Payment succeeded!");
             }
           });
@@ -64,6 +66,8 @@ const StripeCheckout = ({ setCartProduct, cartProduct }) => {
           toast("Your payment was not successful, please try again.");
           break;
         default:
+          navigate("/user/fail");
+
           toast.error("Something went wrong.");
           break;
       }

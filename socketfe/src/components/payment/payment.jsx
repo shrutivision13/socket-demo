@@ -6,16 +6,19 @@ import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import { Elements, useElements, useStripe } from "@stripe/react-stripe-js";
 import StripeCheckout from "../stripeCheckout";
 import { loadStripe } from "@stripe/stripe-js";
+import { useNavigate } from "react-router-dom";
 const stripePromise = loadStripe(
-  "pk_test_51OvbPGIkYBbcGFTmiUqWapN7sJ2X6VcQSis5Knxo2hcm7lOKGqRBpVbrgGCMzG8rDjThBOfeIqAdqPzfFiiXELTp00WhOm93Pf"
+  process.env.REACT_APP_STRIPE_PUBLIC_KEY ||
+    "pk_test_51OvbPGIkYBbcGFTmiUqWapN7sJ2X6VcQSis5Knxo2hcm7lOKGqRBpVbrgGCMzG8rDjThBOfeIqAdqPzfFiiXELTp00WhOm93Pf"
 );
 
 const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
-  console.log("🚀 ~ Payment ~ amount:", amount);
   const [paymentDetails, setPaymentDetails] = useState();
 
   const [submit, setSubmit] = useState(false);
+  console.log("🚀 ~ Payment ~ submit:", submit);
   const [clientSecret, setClientSecret] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (submit) {
@@ -25,14 +28,13 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
       });
       socket.on("server:addPayment", (data) => {
         if (data?.status === 200) {
-          toast.success("Payment success.Order placed");
+          handleResponse();
           setCartProduct();
         } else {
-          toast.error(data?.error || "Something went wrong");
+          handleErrorResponse(data?.error || "Something went wrong");
         }
         socket.off("server:addPayment");
         setSubmit(false);
-        console.log("🚀 ~ socket.on ~ data:", data);
       });
     }
   }, [submit]);
@@ -41,11 +43,23 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
     "payment_intent_client_secret"
   );
 
+  const handleResponse = (message) => {
+    navigate(`/user/success/${cartProduct?._id}`);
+    setCartProduct();
+  };
+
+  const handleErrorResponse = (message) => {
+    navigate(`/user/fail`);
+    toast.error(message);
+  };
+  console.log("🚀 ~ Payment ~ paymentIntent:", paymentIntent);
+
   useEffect(() => {
     if (paymentIntent) {
       setClientSecret(paymentIntent);
     }
   }, [paymentIntent]);
+
   useEffect(() => {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
@@ -61,10 +75,10 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
   };
 
   const authData = {
-    apiLoginID: "8JQ9VSHs7z68",
-    clientKey:
-      "28MyM5fUJmBtPp2683JH5nnkx7CLp6u6KhFEFQs72T3EQV7554tbsY6jgC35fzDr",
+    apiLoginID: process.env.REACT_APP_AUTHORIZED_LOGIN_ID,
+    clientKey: process.env.REACT_APP_AUTHORIZED_CLIENTKEY,
   };
+  console.log("🚀 ~ Payment ~ authData:", authData);
 
   const createOrderApi = () => {
     return new Promise((resolve, reject) => {
@@ -73,11 +87,6 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
       socket.on("server:createpaypalorder", (data) => {
         console.log("Connected to server");
         resolve(data?.jsonResponse?.id);
-      });
-
-      socket.on("connect_error", (error) => {
-        console.error("Failed to connect to server:", error);
-        reject(error);
       });
     });
   };
@@ -97,10 +106,9 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
     socket.on("server:captureorder", (data) => {
       console.log("Connected to server", data);
       if (data?.httpStatusCode === 201) {
-        setCartProduct();
-        toast.success("Payment success.Order placed");
+        handleResponse();
       } else {
-        toast.error(data?.error || "Something went wrong");
+        handleErrorResponse(data?.error || "Something went wrong");
       }
       // resolve(data?.jsonResponse?.id);
     });
@@ -123,13 +131,16 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
       // resolve(data?.jsonResponse?.id);
     });
   };
+  console.log(
+    "🚀 ~ Payment ~ process.env.REACT_APP_PAYPAL_CLIENT_ID:",
+    process.env.REACT_APP_PAYPAL_CLIENT_ID
+  );
 
   return (
     <>
       <PayPalScriptProvider
         options={{
-          clientId:
-            "AcqCDkT0khaboTeDMcCEKL97H7SQBNhJ5papjdJuNZJGUPOxV3l-B7fpqD2XX3m6i0YAduRgd0qPoMcV",
+          clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID,
         }}
       >
         <PayPalButtons createOrder={createOrder} onApprove={onApprove} />
@@ -159,6 +170,7 @@ const Payment = ({ amount, cartProduct, buttonStyle, setCartProduct }) => {
           <StripeCheckout
             setCartProduct={setCartProduct}
             cartProduct={cartProduct}
+            navigate={navigate}
           />
         </Elements>
       )}

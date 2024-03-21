@@ -26,7 +26,9 @@ module.exports = (io) => {
         }
 
         if (data?.platform === "authorized") {
-            refund = await refundTransaction(data?.payment_id, async (res) => {
+            const paymentDetails = await getCartById(data?.id);
+            console.log("🚀 ~ io.on ~ paymentDetails:", paymentDetails)
+            refund = await refundTransaction(data?.payment_id, paymentDetails?.data, async (res) => {
                 console.log("🚀 ~ refund=awaitrefundTransaction ~ data:", res?.messages, res?.messages?.resultCode == "Ok")
                 if (res?.messages?.resultCode == "Ok") {
                     await updateCart(data?.id, { status: data?.status, transactionStatus: "Refund" })

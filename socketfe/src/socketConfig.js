@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
-
-export const socket = io("http://localhost:5000", {
+console.log(process.env.REACT_APP_SOCKET_URL);
+export const socket = io(process.env.REACT_APP_SOCKET_URL, {
     auth: {
         token: localStorage.getItem("token")
     }

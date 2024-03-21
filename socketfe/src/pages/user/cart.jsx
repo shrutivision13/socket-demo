@@ -7,30 +7,56 @@ import ConfirmPopup from "../../components/confirmPopup";
 const Cart = () => {
   // useState
   const [cartProduct, setCartProduct] = useState(null);
+  console.log("🚀 ~ Cart ~ cartProduct:", cartProduct);
   const [open, setOpen] = useState(false);
+  console.log("🚀 ~ Cart ~ open:", open);
   const [product, setProduct] = useState(false);
-  const { setCount } = useContext(CartContext);
+  const { setCount, count } = useContext(CartContext);
+  console.log("🚀 ~ Cart ~ count:", count);
   const user_id = localStorage.getItem("user_id");
 
   useEffect(() => {
     const fetchCartData = () => {
       socket.emit("client:carts", user_id);
       socket.on("server:loadcarts", (data) => {
+        console.log("🚀 ~ socket.on ~ data:", data);
         setCartProduct(data);
         socket.off("server:loadcarts");
       });
     };
 
     const timer = setTimeout(fetchCartData, 1000);
-    return () => clearTimeout(timer);
-  }, [user_id]);
+  }, []);
 
   useEffect(() => {
-    setCount(cartProduct?.product_id?.length || 0);
-  }, [cartProduct, setCount]);
+    if (
+      cartProduct?.product_id?.length !== count &&
+      cartProduct?.product_id?.length
+    ) {
+      setCount(cartProduct?.product_id?.length || 0);
+    }
+  }, [cartProduct?.product_id?.length]);
 
   const updateCart = (data) => {
     setCartProduct(data);
+  };
+  const addToCart = (id, quantity) => {
+    socket.emit("client:addcart", {
+      product_id: id,
+      user_id: user_id,
+      quantity,
+    });
+    socket.on("server:addcart", (data) => {
+      console.log("🚀 ~ socket.on ~ data:", data);
+      if (data?.status === 200) {
+        setCartProduct(data?.data);
+
+        toast.success(data?.message);
+      } else {
+        toast.error(data?.error);
+      }
+      socket.off("server:addcart");
+    });
   };
 
   const removeFromCart = (id, cart_id) => {
@@ -65,11 +91,19 @@ const Cart = () => {
   };
 
   const calculateTotal = () => {
-    return cartProduct?.product_id?.reduce(
-      (sum, item) => sum + item?.product?.price * item?.quantity,
-      0
-    );
+    return cartProduct?.product_id?.reduce((sum, item) => {
+      console.log("🚀 ~ returncartProduct?.product_id?.reduce ~ item:", item);
+      let price =
+        parseInt(item?.product?.discount) > 0
+          ? item?.product?.price -
+            (item?.product?.price * parseInt(item?.product?.discount)) / 100
+          : item?.product?.price;
+      console.log("🚀 ~ returncartProduct?.product_id?.reduce ~ price:", price);
+
+      return sum + price * (item?.quantity || 1);
+    }, 0);
   };
+  console.log("🚀 ~ calculateTotal ~ calculateTotal:", calculateTotal());
 
   return (
     <div className="  ">
@@ -101,75 +135,99 @@ const Cart = () => {
               <p className="lg:text-xl text-xl font-black leading-10 text-gray-800  pt-10">
                 Bag
               </p>
-              {cartProduct?.product_id?.map((item) => (
-                <div className="md:flex items-strech py-8 md:py-10 lg:py-8">
-                  <div className="md:w-4/12 2xl:w-1/4 w-full">
-                    <img
-                      src={item?.product?.images[0]}
-                      alt="Black Leather Bag"
-                      className="h-full object-center object-cover md:block rounded  "
-                    />
-                  </div>
-                  <div className="md:pl-3 md:w-8/12 2xl:w-3/4 flex flex-col justify-center">
-                    <p className="text-xs leading-3 text-gray-800  md:pt-0 pt-4">
-                      {item?.product?.sku}
-                    </p>
-                    <div className="flex items-center justify-between w-full pt-1">
-                      <p className="text-base font-semibold leading-none text-gray-800 ">
-                        {item?.product?.name}
-                      </p>
-                      <div className="flex items-center gap-3">
-                        <button
-                          className="text-xs leading-3  text-gray-800  p-1  px-[6px] cursor-pointer rounded border "
-                          disabled={item?.quantity <= 1}
-                          onClick={() =>
-                            addToCart(item?.product?._id, item?.quantity - 1)
-                          }
-                        >
-                          -
-                        </button>
-                        <p>{item?.quantity}</p>
-                        <button
-                          onClick={() =>
-                            addToCart(item?.product?._id, item?.quantity + 1)
-                          }
-                          className="text-xs leading-3  text-grey-500 p-1 px-[7px]    cursor-pointer border rounded "
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-xs leading-3 text-gray-600  pt-2 ">
-                      {item?.product?.category}
-                    </p>
+              {cartProduct?.product_id?.map((item) => {
+                let discountPrice =
+                  item?.product?.price -
+                  (item?.product?.price * item?.product?.discount) / 100;
 
-                    {item?.product?.stockQty < 10 ? (
-                      <p className="w-96 text-xs leading-3 text-gray-600  pt-3">
-                        Hurry, only {item?.product?.stockQty} left in stock.
+                return (
+                  <div className="md:flex items-strech py-8 md:py-10 lg:py-8">
+                    <div className="md:w-4/12 2xl:w-1/4 w-full">
+                      <img
+                        src={item?.product?.images?.[0]}
+                        alt="Black Leather Bag"
+                        className="h-full object-center object-cover md:block rounded  "
+                      />
+                    </div>
+                    <div className="md:pl-3 md:w-8/12 2xl:w-3/4 flex flex-col justify-center">
+                      <p className="text-xs leading-3 text-gray-800  md:pt-0 pt-4">
+                        {item?.product?.sku}
                       </p>
-                    ) : null}
-                    <div className="flex items-center justify-between pt-3">
-                      <div className="flex items-center">
-                        <button
-                          onClick={
-                            () => {
-                              setProduct(item);
-                              setOpen(true);
+                      <div className="flex items-center justify-between w-full pt-1">
+                        <p className="text-base font-semibold leading-none text-gray-800 ">
+                          {item?.product?.name}
+                        </p>
+                        <div className="flex items-center gap-3">
+                          <button
+                            className="text-xs leading-3  text-gray-800  p-1  px-[6px] cursor-pointer rounded border "
+                            disabled={item?.quantity <= 1}
+                            onClick={() =>
+                              addToCart(item?.product?._id, item?.quantity - 1)
                             }
-                            // removeCart(item?.product?._id, item?._id)
-                          }
-                          className="text-xs leading-3 underline text-red-500  cursor-pointer"
-                        >
-                          Remove
-                        </button>
+                          >
+                            -
+                          </button>
+                          <p>{item?.quantity}</p>
+                          <button
+                            onClick={() =>
+                              addToCart(item?.product?._id, item?.quantity + 1)
+                            }
+                            className="text-xs leading-3  text-grey-500 p-1 px-[7px]    cursor-pointer border rounded "
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
-                      <p className="text-base font-black leading-none text-gray-800 ">
-                        ${item?.product?.price}
+                      <p className="text-xs leading-3 text-gray-600  pt-2 ">
+                        {item?.product?.category}
                       </p>
+
+                      {item?.product?.stockQty < 10 ? (
+                        <p className="w-96 text-xs leading-3 text-gray-600  pt-3">
+                          Hurry, only {item?.product?.stockQty} left in stock.
+                        </p>
+                      ) : null}
+                      <div className="flex items-center justify-between pt-3">
+                        <div className="flex items-center">
+                          <button
+                            onClick={
+                              () => {
+                                setProduct(item);
+                                setOpen(true);
+                              }
+                              // removeCart(item?.product?._id, item?._id)
+                            }
+                            className="text-xs leading-3 underline text-red-500  cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2 text-md">
+                          <p className={`   font-bold text-slate-800`}>
+                            {item?.product?.discount != 0
+                              ? `$${discountPrice}`
+                              : ""}{" "}
+                            <span
+                              className={` ${
+                                item?.product?.discount > 0
+                                  ? "line-through"
+                                  : ""
+                              } text-md font-bold text-slate-600`}
+                            >
+                              ${item?.product?.price}
+                            </span>
+                          </p>
+                          {item?.product?.discount > 0 ? (
+                            <p className="text-xs">
+                              {item?.product?.discount}% off
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               {(!cartProduct || cartProduct?.product_id?.length === 0) && (
                 <p className="text-base font-black leading-none text-gray-800  pt-10">
                   Your cart is empty

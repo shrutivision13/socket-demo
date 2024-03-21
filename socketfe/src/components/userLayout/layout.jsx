@@ -9,7 +9,7 @@ const UserLayout = () => {
       <div className="flex flex-col w-full ">
         <div className="flex-1">
           <Navbar />
-          <div className="mt-[0px]">
+          <div className="mt-[0px] h-full">
             <Outlet />
           </div>
         </div>

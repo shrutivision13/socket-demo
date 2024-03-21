@@ -113,33 +113,9 @@ async function chargeCreditCard(body, callback) {
     billTo.setLastName(body?.customerInformation?.lastName);
 
 
-    var shipTo = new ApiContracts.CustomerAddressType();
-    // shipTo.setFirstName('China');
-    // shipTo.setLastName('Bayles');
-    // shipTo.setCompany('Thyme for Tea');
-    // shipTo.setAddress('12 Main Street');
-    // shipTo.setCity('Pecan Springs');
-    // shipTo.setState('TX');
-    // shipTo.setZip('44628');
-    // shipTo.setCountry('USA');
 
-    var lineItem_id1 = new ApiContracts.LineItemType();
-    // lineItem_id1.setItemId('1');
-    // lineItem_id1.setName('vase');
-    // lineItem_id1.setDescription('cannes logo');
-    // lineItem_id1.setQuantity('18');
-    // lineItem_id1.setUnitPrice(45.00);
 
-    var lineItem_id2 = new ApiContracts.LineItemType();
-    // lineItem_id2.setItemId('2');
-    // lineItem_id2.setName('vase2');
-    // lineItem_id2.setDescription('cannes logo2');
-    // lineItem_id2.setQuantity('28');
-    // lineItem_id2.setUnitPrice('25.00');
 
-    var lineItemList = [];
-    lineItemList.push(lineItem_id1);
-    lineItemList.push(lineItem_id2);
 
     var lineItems = new ApiContracts.ArrayOfLineItem();
     // lineItems.setLineItem(lineItemList);
@@ -148,45 +124,16 @@ async function chargeCreditCard(body, callback) {
     userField_a.setName('A');
     userField_a.setValue('Aval');
 
-    // var userField_b = new ApiContracts.UserField();
-    // userField_b.setName('B');
-    // userField_b.setValue('Bval');
-
-    // var userFieldList = [];
-    // userFieldList.push(userField_a);
-    // userFieldList.push(userField_b);
-
-    // var userFields = new ApiContracts.TransactionRequestType.UserFields();
-    // userFields.setUserField(userFieldList);
-
-    // var transactionSetting1 = new ApiContracts.SettingType();
-    // transactionSetting1.setSettingName('duplicateWindow');
-    // transactionSetting1.setSettingValue('120');
-
-    // var transactionSetting2 = new ApiContracts.SettingType();
-    // transactionSetting2.setSettingName('recurringBilling');
-    // transactionSetting2.setSettingValue('false');
-
-    // var transactionSettingList = [];
-    // transactionSettingList.push(transactionSetting1);
-    // transactionSettingList.push(transactionSetting2);
-
-    // var transactionSettings = new ApiContracts.ArrayOfSetting();
-    // transactionSettings.setSetting(transactionSettingList);
 
     var transactionRequestType = new ApiContracts.TransactionRequestType();
     transactionRequestType.setTransactionType(ApiContracts.TransactionTypeEnum.AUTHCAPTURETRANSACTION);
     transactionRequestType.setPayment(paymentType);
     transactionRequestType.setAmount(body?.product?.amount);
     transactionRequestType.setLineItems(lineItems);
-    // transactionRequestType.setUserFields(userFields);
     transactionRequestType.setOrder(orderDetails);
-    // transactionRequestType.setTax(tax);
-    // transactionRequestType.setDuty(duty);
+    ;
     transactionRequestType.setShipping(shipping);
     transactionRequestType.setBillTo(billTo);
-    transactionRequestType.setShipTo(shipTo);
-    // transactionRequestType.setTransactionSettings(transactionSettings);
 
     var createRequest = new ApiContracts.CreateTransactionRequest();
     createRequest.setMerchantAuthentication(merchantAuthenticationType);
@@ -204,45 +151,21 @@ async function chargeCreditCard(body, callback) {
         var apiResponse = ctrl.getResponse();
 
         var response = new ApiContracts.CreateTransactionResponse(apiResponse);
-        console.log("🚀 ~ response:", response, response.getTransactionResponse()?.transId)
 
         //pretty print response
         console.log(JSON.stringify(response, null, 2));
 
         if (response != null) {
             if (response.getMessages().getResultCode() == ApiContracts.MessageTypeEnum.OK) {
-                if (response.getTransactionResponse().getMessages() != null) {
-                    console.log('Successfully created transaction with Transaction ID: ' + response.getTransactionResponse().getTransId());
-                    console.log('Response Code: ' + response.getTransactionResponse().getResponseCode());
-                    console.log('Message Code: ' + response.getTransactionResponse().getMessages().getMessage()[0].getCode());
-                    console.log('Description: ' + response.getTransactionResponse().getMessages().getMessage()[0].getDescription());
-                    const cart = await updateCart(body?.product?.cart_id, { cardNumber: body?.encryptedCardData?.cardNumber, expiryDate: body?.encryptedCardData?.expDate, transactionId: response.getTransactionResponse()?.transId, networkTransId: response?.getTransactionResponse()?.networkTransId, status: "Ordered", transactionStatus: "Success", platform: "authorized" })
-                    return callback(cart)
+                const cart = await updateCart(body?.product?.cart_id, { cardNumber: body?.encryptedCardData?.cardNumber, expiryDate: body?.encryptedCardData?.expDate, transactionId: response.getTransactionResponse()?.transId, networkTransId: response?.getTransactionResponse()?.networkTransId, status: "Ordered", transactionStatus: "Success", platform: "authorized" })
+                return callback(cart)
 
-
-                }
-                else {
-                    console.log('Failed Transaction.');
-                    if (response.getTransactionResponse().getErrors() != null) {
-                        console.log('Error Code: ' + response.getTransactionResponse().getErrors().getError()[0].getErrorCode());
-                        console.log('Error message: ' + response.getTransactionResponse().getErrors().getError()[0].getErrorText());
-                    }
-
-                }
             }
             else {
                 console.log('Failed Transaction. ');
-                if (response.getTransactionResponse() != null && response.getTransactionResponse().getErrors() != null) {
 
-                    console.log('Error Code: ' + response.getTransactionResponse().getErrors().getError()[0].getErrorCode());
-                    console.log('Error message: ' + response.getTransactionResponse().getErrors().getError()[0].getErrorText());
-                }
-                else {
-                    console.log('Error Code: ' + response.getMessages().getMessage()[0].getCode());
-                    console.log('Error message: ' + response.getMessages().getMessage()[0].getText());
-                }
+                return callback({ error: response, status: 500 });
             }
-            return callback({ error: response, status: 500 });
         }
         else {
             return callback({ error: "Something went wrong", status: 500 });
@@ -299,11 +222,7 @@ const createOrder = async (cart) => {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            // Uncomment one of these to force an error for negative testing (in sandbox mode only). Documentation:
-            // https://developer.paypal.com/tools/sandbox/negative-testing/request-headers/
-            // "PayPal-Mock-Response": '{"mock_application_codes": "MISSING_REQUIRED_PARAMETER"}'
-            // "PayPal-Mock-Response": '{"mock_application_codes": "PERMISSION_DENIED"}'
-            // "PayPal-Mock-Response": '{"mock_application_codes": "INTERNAL_SERVER_ERROR"}'
+
         },
         method: "POST",
         body: JSON.stringify(payload),
@@ -321,11 +240,7 @@ const captureOrder = async (orderID) => {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            // Uncomment one of these to force an error for negative testing (in sandbox mode only). Documentation:
-            // https://developer.paypal.com/tools/sandbox/negative-testing/request-headers/
-            // "PayPal-Mock-Response": '{"mock_application_codes": "INSTRUMENT_DECLINED"}'
-            // "PayPal-Mock-Response": '{"mock_application_codes": "TRANSACTION_REFUSED"}'
-            // "PayPal-Mock-Response": '{"mock_application_codes": "INTERNAL_SERVER_ERROR"}'
+
         },
     });
 
@@ -335,7 +250,6 @@ const captureOrder = async (orderID) => {
 async function handleResponse(response) {
     try {
         const jsonResponse = await response.json();
-        console.log("🚀 ~ handleResponse ~ jsonResponse:", jsonResponse)
         return {
             jsonResponse,
             httpStatusCode: response.status,
@@ -356,7 +270,6 @@ const createStripePaymentIntent = async (paymentItems, amount) => {
             enabled: true,
         },
     });
-    console.log("🚀 ~ createStripePaymentIntent ~ paymentIntent:", paymentIntent)
 
     return ({ clientSecret: paymentIntent.client_secret });
 }

@@ -66,9 +66,9 @@ const getAllCarts = async (user_id, res) => {
     }
 }
 
-const getCartById = async (req, res) => {
+const getCartById = async (id, res) => {
     try {
-        const cart = await Cart.findById(req.params.id);
+        const cart = await Cart.findById(id).populate('product_id.product');
         if (!cart) return { error: "Cart not found", status: 404 };
         return { data: cart, status: 200 };
     } catch (error) {
@@ -81,7 +81,7 @@ const updateCart = async (id, body) => {
     try {
         const updatedCart = await Cart.findByIdAndUpdate(id, body, { new: true });
         updatedCart?.product_id?.map(async (item) => {
-            await Product.updateOne({ _id: item?.product }, { $inc: { stockQty: -item?.quantity } })
+            await Product.updateOne({ _id: item?.product }, { $inc: { stockQty: -parseInt(item?.quantity) } })
         })
         if (!updatedCart) return { error: "Cart not found", status: 404 };
         return { data: updatedCart, status: 200, message: "Cart updated successfully" };
